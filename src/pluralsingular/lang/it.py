@@ -33,11 +33,13 @@ class PluralizerSingularizer:
     def singularize(word: str) -> str:
         if word in PluralizerSingularizer.REVERSE_EXCEPTIONS:
             return PluralizerSingularizer.REVERSE_EXCEPTIONS[word]
-        if word.endswith(('i')) and len(word) > 1:
-            if word[:-1].endswith(('o', 'e')):
+        if word.endswith('i') and len(word) > 1:
+            if word[-3:-1] in ['on', 'in', 'ar', 'or', 'ur', 'an']:
                 return word[:-1] + 'o'
-            return word[:-1]  # Remove 'i'
-        if word.endswith(('e')) and len(word) > 1:
+            if word[-2] in 'aeiou':
+                return word[:-1] + 'o'
+            return word[:-1]
+        if word.endswith('e') and len(word) > 1:
             return word[:-1] + 'a'
         return word
 
@@ -47,7 +49,9 @@ if __name__ == "__main__":
     print(PluralizerSingularizer.pluralize("bue"))  # 'buoi'
     print(PluralizerSingularizer.pluralize("dio"))  # 'dei'
     print(PluralizerSingularizer.pluralize("tempio"))  # 'templi'
+    print(PluralizerSingularizer.pluralize("bambino"))  # 'bambini'
     print(PluralizerSingularizer.singularize("uomini"))  # 'uomo'
     print(PluralizerSingularizer.singularize("buoi"))  # 'bue'
     print(PluralizerSingularizer.singularize("dei"))  # 'dio'
     print(PluralizerSingularizer.singularize("templi"))  # 'tempio'
+    print(PluralizerSingularizer.singularize("bambini"))  # 'bambino'

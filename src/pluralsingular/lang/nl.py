@@ -27,7 +27,7 @@ class PluralizerSingularizer:
         elif word.endswith(('s', 'x', 'z')):
             return word + 'en'
         elif word.endswith(('a', 'i', 'o', 'u', 'y')):
-            return word + ''s'
+            return word + "'s"
         elif word.endswith(('el', 'em', 'en', 'er', 'je')):
             return word
         else:
@@ -43,7 +43,7 @@ class PluralizerSingularizer:
             return word[:-3] + 'f'
         if word.endswith('en') and len(word) > 2:
             return word[:-2]
-        if word.endswith(''s') and len(word) > 2:
+        if word.endswith("'s") and len(word) > 2:
             return word[:-2]
         return word
 

@@ -12,6 +12,19 @@ class PluralizerSingularizer:
         'hibou': 'hiboux',
         'joujou': 'joujoux',
         'pou': 'poux',
+        'cão': 'cães',
+        'pão': 'pães',
+        'alemão': 'alemães',
+        'capitão': 'capitães',
+        'cristão': 'cristãos',
+        'mão': 'mãos',
+        'irmão': 'irmãos',
+        'cidadão': 'cidadãos',
+        'leão': 'leões',
+        'limão': 'limões',
+        'melão': 'melões',
+        'canhão': 'canhões',
+        'barracão': 'barracões',
     }
 
     REVERSE_EXCEPTIONS = {v: k for k, v in EXCEPTIONS.items()}

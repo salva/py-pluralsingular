@@ -7,6 +7,7 @@ class PluralizerSingularizer:
         'παιδι': 'παιδια',  # παιδί -> παιδιά (child -> children)
         'μητερα': 'μητερες',  # μητέρα -> μητέρες (mother -> mothers)
         'γυναίκα': 'γυναίκες',  # γυναίκα -> γυναίκες (woman -> women)
+        'παιδί': 'παιδιά',
     }
 
     REVERSE_EXCEPTIONS = {v: k for k, v in EXCEPTIONS.items()}

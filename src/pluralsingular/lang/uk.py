@@ -3,15 +3,11 @@ import unicodedata
 class PluralizerSingularizer:
     
     EXCEPTIONS = {
-        'cheval': 'chevaux',
-        'travail': 'travaux',
-        'bijou': 'bijoux',
-        'caillou': 'cailloux',
-        'chou': 'choux',
-        'genou': 'genoux',
-        'hibou': 'hiboux',
-        'joujou': 'joujoux',
-        'pou': 'poux',
+        'люди': 'люди',  # люди (people) - invariable
+        'дити': 'дити',  # діти (children) - invariable
+        'стіл': 'столи',  # стіл -> столи (table -> tables)
+        'брат': 'брати',  # брат -> брати (brother -> brothers)
+        'друг': 'друзі',  # друг -> друзі (friend -> friends)
     }
 
     REVERSE_EXCEPTIONS = {v: k for k, v in EXCEPTIONS.items()}
@@ -24,32 +20,42 @@ class PluralizerSingularizer:
     def pluralize(word: str) -> str:
         if word in PluralizerSingularizer.EXCEPTIONS:
             return PluralizerSingularizer.EXCEPTIONS[word]
-        if word.endswith(('al')):
-            return word[:-2] + 'aux'
-        elif word.endswith(('eau', 'au', 'eu')):
-            return word + 'x'
-        elif word.endswith(('s', 'x', 'z')):
-            return word
+        if word.endswith(('а', 'я')):
+            return word[:-1] + 'и'
+        elif word.endswith(('о', 'е')):
+            return word[:-1] + 'а'
+        elif word.endswith(('ь')):
+            return word[:-1] + 'і'
+        elif word.endswith(('й')):
+            return word[:-1] + 'ї'
+        elif word.endswith(('ц')):
+            return word + 'і'
+        elif word.endswith(('ж', 'ч', 'ш', 'щ')):
+            return word + 'і'
         else:
-            return word + 's'
+            return word + 'и'
     
     @staticmethod
     def singularize(word: str) -> str:
         if word in PluralizerSingularizer.REVERSE_EXCEPTIONS:
             return PluralizerSingularizer.REVERSE_EXCEPTIONS[word]
-        if word.endswith('aux') and len(word) > 3:
-            return word[:-3] + 'al'
-        if word.endswith(('eaux', 'aux', 'eux')) and len(word) > 3:
-            return word[:-1]  # Remove 'x'
-        elif word.endswith(('s', 'x', 'z')) and len(word) > 1:
-            return word[:-1]  # Remove 's', 'x', or 'z'
+        if word.endswith(('и')) and len(word) > 1:
+            return word[:-1] + 'а'
+        if word.endswith(('і')) and len(word) > 1:
+            if word[-2] in 'жчшщц':
+                return word[:-1]  # Remove 'і'
+            return word[:-1] + 'ь'
+        if word.endswith(('ї')) and len(word) > 1:
+            return word[:-1] + 'й'
+        if word.endswith(('а')) and len(word) > 1:
+            return word[:-1] + 'о'
         return word
 
 
 if __name__ == "__main__":
-    print(PluralizerSingularizer.pluralize("cheval"))  # 'chevaux'
-    print(PluralizerSingularizer.pluralize("travail"))  # 'travaux'
-    print(PluralizerSingularizer.pluralize("bijou"))  # 'bijoux'
-    print(PluralizerSingularizer.singularize("chevaux"))  # 'cheval'
-    print(PluralizerSingularizer.singularize("travaux"))  # 'travail'
-    print(PluralizerSingularizer.singularize("bijoux"))  # 'bijou'
+    print(PluralizerSingularizer.pluralize('стіл'))  # 'столи' (tables)
+    print(PluralizerSingularizer.pluralize('брат'))  # 'брати' (brothers)
+    print(PluralizerSingularizer.pluralize('друг'))  # 'друзі' (friends)
+    print(PluralizerSingularizer.singularize('столи'))  # 'стіл' (table)
+    print(PluralizerSingularizer.singularize('брати'))  # 'брат' (brother)
+    print(PluralizerSingularizer.singularize('друзі'))  # 'друг' (friend)

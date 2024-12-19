@@ -25,6 +25,7 @@ class PluralizerSingularizer:
         'paraguas': 'paraguas',
         'tijeras': 'tijeras',
         'gafas': 'gafas',
+        'rey': 'reyes',
     }
 
     REVERSE_EXCEPTIONS = {v: k for k, v in EXCEPTIONS.items()}
