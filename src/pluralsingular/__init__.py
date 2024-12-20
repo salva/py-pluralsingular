@@ -37,7 +37,7 @@ def _get_backend(lang: str):
             raise ValueError(f"Language '{lang}' not supported.")
     return _BACKEND_CACHE[lang]
 
-def pluralize(word: str, lang: str = 'en') -> str:
+def pluralize(word: str, lang: str = 'en', **kwargs) -> str:
     """
     Pluralize a word based on the given language.
 
@@ -55,9 +55,9 @@ def pluralize(word: str, lang: str = 'en') -> str:
         'futboles'
     """
     backend = _get_backend(lang)
-    return backend.PluralizerSingularizer.pluralize(str(word).casefold())
+    return backend.PluralizerSingularizer.pluralize(str(word).casefold(), **kwargs)
 
-def singularize(word: str, lang: str = 'en') -> str:
+def singularize(word: str, lang: str = 'en', **kwargs) -> str:
     """
     Singularize a word based on the given language.
 
@@ -75,4 +75,4 @@ def singularize(word: str, lang: str = 'en') -> str:
         'futbol'
     """
     backend = _get_backend(lang)
-    return backend.PluralizerSingularizer.singularize(str(word).casefold())
+    return backend.PluralizerSingularizer.singularize(str(word).casefold(), **kwargs)
