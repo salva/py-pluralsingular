@@ -10,7 +10,7 @@ class PluralizerSingularizer:
     incorrect behavior or have suggestions for improvement, please contribute.
     """
 
-    PLURALIZE_EXCEPTIONS = {
+    COMMON_EXCEPTIONS = {
         'país': 'países',
         'luz': 'luces',
         'pez': 'peces',
@@ -36,10 +36,60 @@ class PluralizerSingularizer:
         'jardín': 'jardines',
         'pais': 'paises',
         'coche': 'coches',
+        'abdomen': 'abdómenes',
+        'carácter': 'caracteres',
+        'este': 'estes',
+        'hoy': 'hoy',
+        'imagen': 'imágenes',
+        'oeste': 'oestes',
+        'origen': 'orígenes',
+        'por': 'pores',
+        'volumen': 'volúmenes',
+        'autobús': 'autobuses',
+        'aire': 'aires',
+        'alcalde': 'alcaldes',
+        'avance': 'avances',
+        'base': 'bases',
+        'calle': 'calles',
+        'carne': 'carnes',
+        'cien': 'cienes',
+        'cierre': 'cierres',
+        'cine': 'cines',
+        'clase': 'clases',
+        'entre': 'entres',
+        'gripe': 'gripes',
+        'gris': 'gris',
+        'informe': 'informes',
+        'jueves': 'jueves',
+        'llave': 'llaves',
+        'lunes': 'lunes',
+        'madre': 'madres',
+        'miércoles': 'miércoles',
+        'nieve': 'nieves',
+        'noche': 'noches',
+        'nueve': 'nueves',
+        'orden': 'ordenes',
+        'padre': 'padres',
+        'porotos': 'porotos',
+        'saltamontes': 'saltamontes',
+        'sangre': 'sangres',
+        'seis': 'seis',
+        'tarde': 'tardes',
+        'tigre': 'tigres',
+        'tres': 'tres',
+        'verde': 'verdes',
+        'viernes': 'viernes',
+        'ómnibus': 'ómnibus',
+        'nupcias': 'nupcias',
+        'fase': 'fases',
+        'martes': 'martes',
     }
 
+    PLURALIZE_EXCEPTIONS = {}
     SINGULARIZE_EXCEPTIONS = {}
-    for singular, plural in PLURALIZE_EXCEPTIONS.items():
+
+    for singular, plural in COMMON_EXCEPTIONS.items():
+        PLURALIZE_EXCEPTIONS.setdefault(singular, plural)
         SINGULARIZE_EXCEPTIONS.setdefault(plural, singular)
 
     @staticmethod
@@ -63,9 +113,10 @@ class PluralizerSingularizer:
         if word.endswith(('á', 'í', 'ó', 'ú')):
             return word + "es"
 
-        # Words ending in -és get -eses: holandés => holandeses.
-        if word.endswith("és"):
-            return word[:-2] + "eses"
+        # Words ending in -és get -eses: holandés => holandeses, autobús => autobuses.
+        for (a, b) in (('ás', 'ases'), ('és', 'eses'), ('ís', 'ises'), ('ós', 'oses'), ('ús', 'uses')):
+            if word.endswith(a):
+                return word[:-2] + b
 
         # Words ending in -s preceded by an unstressed vowel: gafas => gafas.
         if word.endswith("s") and len(word) > 3 and word[-2] in ('a', 'e', 'i', 'o', 'u'):
@@ -96,10 +147,11 @@ class PluralizerSingularizer:
                 if word[:-2].endswith(("br", "i", "j", "t", "zn")):
                     return word[:-1]
 
-                # gestiones => gestión
+                # gestiones => gestión, ataques => ataque
                 for a, b in (("anes", "án"), ("enes", "én"),
                              ("eses", "és"), ("ines", "ín"),
-                             ("ones", "ón"), ("unes", "ún")):
+                             ("ones", "ón"), ("unes", "ún"),
+                             ("ques", "que")):
                     if word.endswith(a):
                         # no monosyllables, no accents
                         if re.search(r'[aeiou]', word[:-4]) and not re.search(r'[áéíóú]', word[:-4]):
@@ -113,7 +165,7 @@ class PluralizerSingularizer:
                 return word[:-2]
 
             # hipotesis => hipothesis
-            if word.endswith(("esis", "isis", "osis")):
+            if word.endswith(("asis", "esis", "isis", "osis")):
                 return word
 
             # gatos => gato
