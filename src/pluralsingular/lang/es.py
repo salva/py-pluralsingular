@@ -1,5 +1,7 @@
 import unicodedata
 
+import re
+
 class PluralizerSingularizer:
     """
     This module provides methods to pluralize and singularize Spanish words.
@@ -8,7 +10,7 @@ class PluralizerSingularizer:
     incorrect behavior or have suggestions for improvement, please contribute.
     """
 
-    EXCEPTIONS = {
+    PLURALIZE_EXCEPTIONS = {
         'país': 'países',
         'luz': 'luces',
         'pez': 'peces',
@@ -25,10 +27,20 @@ class PluralizerSingularizer:
         'paraguas': 'paraguas',
         'tijeras': 'tijeras',
         'gafas': 'gafas',
-        'rey': 'reyes',
+        'el': 'los',
+        'la': 'las',
+        'mamá': 'mamás',
+        'papá': 'papás',
+        'sofá': 'sofás',
+        'dominó': 'dominós',
+        'jardín': 'jardines',
+        'pais': 'paises',
+        'coche': 'coches',
     }
 
-    REVERSE_EXCEPTIONS = {v: k for k, v in EXCEPTIONS.items()}
+    SINGULARIZE_EXCEPTIONS = {}
+    for singular, plural in PLURALIZE_EXCEPTIONS.items():
+        SINGULARIZE_EXCEPTIONS.setdefault(plural, singular)
 
     @staticmethod
     def remove_accent(char: str) -> str:
@@ -36,39 +48,77 @@ class PluralizerSingularizer:
 
     @staticmethod
     def pluralize(word: str) -> str:
-        if word in PluralizerSingularizer.EXCEPTIONS:
-            return PluralizerSingularizer.EXCEPTIONS[word]
-        vowels = "aeiouáéíóú"
-        if word.endswith(('z')):
-            return word[:-1] + 'ces'
-        elif word.endswith(('on', 'en', 'an', 'in', 'un')) and word[-3] in 'aeiouáéíóú':
-            return word[:-2] + PluralizerSingularizer.remove_accent(word[-2]) + 'nes'
-        elif word.endswith('y'):
-            return word[:-1] + 'ies'
-        elif word.endswith('s'):
+        if word in PluralizerSingularizer.PLURALIZE_EXCEPTIONS:
+            return PluralizerSingularizer.PLURALIZE_EXCEPTIONS[word]
+
+        # Words endings that are unlikely to inflect.
+        if word.endswith(("esis", "isis", "osis")):
             return word
-        elif word.endswith(tuple(vowels)):
-            return word + 's'
-        else:
-            return word + 'es'
-    
+
+        # Words ending in a vowel get -s: gato => gatos.
+        if word.endswith(('a', 'e', 'é', 'i', 'o', 'u')):
+            return word + "s"
+
+        # Words ending in a stressed vowel get -s: hindú => hindúes.
+        if word.endswith(('á', 'í', 'ó', 'ú')):
+            return word + "es"
+
+        # Words ending in -és get -eses: holandés => holandeses.
+        if word.endswith("és"):
+            return word[:-2] + "eses"
+
+        # Words ending in -s preceded by an unstressed vowel: gafas => gafas.
+        if word.endswith("s") and len(word) > 3 and word[-2] in ('a', 'e', 'i', 'o', 'u'):
+            return word
+
+        # Words ending in -z get -ces: luz => luces
+        if word.endswith("z"):
+            return word[:-1] + "ces"
+
+        # Words that change vowel stress: graduación => graduaciones.
+        for a, b in (("án", "anes"), ("én", "enes"),
+                     ("ín", "ines"), ("ón", "ones"),
+                     ("ún", "unes")):
+            if word.endswith(a):
+                return word[:-2] + b
+
+        # Words ending in a consonant get -es.
+        return word + "es"
+
     @staticmethod
     def singularize(word: str) -> str:
-        if word in PluralizerSingularizer.REVERSE_EXCEPTIONS:
-            return PluralizerSingularizer.REVERSE_EXCEPTIONS[word]
-        if word.endswith('nes') and len(word) > 4:
-            if word[-4] in 'aeiouáéíóú':
-                return word[:-3] + unicodedata.normalize('NFD', word[-4])[0] + 'n'
-        if word.endswith('cies') and len(word) > 4:
-            return word[:-3] + 'y'
-        if word.endswith('ces') and len(word) > 3 and word[-4] != 'z':
-            return word[:-3] + 'z'
-        elif word.endswith('es') and len(word) > 2:
-            if word[-3] not in 'aeiouáéíóú':
+
+        if word in PluralizerSingularizer.SINGULARIZE_EXCEPTIONS:
+            return PluralizerSingularizer.SINGULARIZE_EXCEPTIONS[word]
+
+        if word.endswith("s"):
+            if word.endswith("es"):
+                if word[:-2].endswith(("br", "i", "j", "t", "zn")):
+                    return word[:-1]
+
+                # gestiones => gestión
+                for a, b in (("anes", "án"), ("enes", "én"),
+                             ("eses", "és"), ("ines", "ín"),
+                             ("ones", "ón"), ("unes", "ún")):
+                    if word.endswith(a):
+                        # no monosyllables, no accents
+                        if re.search(r'[aeiou]', word[:-4]) and not re.search(r'[áéíóú]', word[:-4]):
+                            return word[:-4] + b
+                        break
+
+                # luces => luz
+                if word.endswith("ces"):
+                    return word[:-3] + "z"
+
                 return word[:-2]
+
+            # hipotesis => hipothesis
+            if word.endswith(("esis", "isis", "osis")):
+                return word
+
+            # gatos => gato
             return word[:-1]
-        elif word.endswith('s') and len(word) > 1 and word not in PluralizerSingularizer.REVERSE_EXCEPTIONS.keys():
-            return word[:-1]
+
         return word
 
 if __name__ == "__main__":

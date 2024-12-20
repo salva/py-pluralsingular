@@ -55,7 +55,7 @@ def pluralize(word: str, lang: str = 'en') -> str:
         'futboles'
     """
     backend = _get_backend(lang)
-    return backend.PluralizerSingularizer.pluralize(word)
+    return backend.PluralizerSingularizer.pluralize(str(word).casefold())
 
 def singularize(word: str, lang: str = 'en') -> str:
     """
@@ -75,4 +75,4 @@ def singularize(word: str, lang: str = 'en') -> str:
         'futbol'
     """
     backend = _get_backend(lang)
-    return backend.PluralizerSingularizer.singularize(word)
+    return backend.PluralizerSingularizer.singularize(str(word).casefold())
